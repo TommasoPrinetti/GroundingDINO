@@ -1,4 +1,11 @@
 from typing import Tuple, List
+import os
+import sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+groundingdino_path = os.path.join('groundingdino')
+sys.path.append(groundingdino_path)
+sys.path.append(current_dir)
 
 import cv2
 import numpy as np

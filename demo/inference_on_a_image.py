@@ -2,17 +2,21 @@ import argparse
 import os
 import sys
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+groundingdino_path = os.path.join('groundingdino')
+sys.path.append(groundingdino_path)
+sys.path.append(current_dir)
+
 import numpy as np
 import torch
 from PIL import Image, ImageDraw, ImageFont
 
-import groundingdino.datasets.transforms as T
+from groundingdino.datasets import transforms as T
 from groundingdino.models import build_model
 from groundingdino.util import box_ops
 from groundingdino.util.slconfig import SLConfig
 from groundingdino.util.utils import clean_state_dict, get_phrases_from_posmap
 from groundingdino.util.vl_utils import create_positive_map_from_span
-
 
 def plot_boxes_to_image(image_pil, tgt):
     H, W = tgt["size"]
@@ -54,7 +58,6 @@ def plot_boxes_to_image(image_pil, tgt):
 
     return image_pil, mask
 
-
 def load_image(image_path):
     # load image
     image_pil = Image.open(image_path).convert("RGB")  # load image
@@ -69,7 +72,6 @@ def load_image(image_path):
     image, _ = transform(image_pil, None)  # 3, h, w
     return image_pil, image
 
-
 def load_model(model_config_path, model_checkpoint_path, cpu_only=False):
     args = SLConfig.fromfile(model_config_path)
     args.device = "cuda" if not cpu_only else "cpu"
@@ -79,7 +81,6 @@ def load_model(model_config_path, model_checkpoint_path, cpu_only=False):
     print(load_res)
     _ = model.eval()
     return model
-
 
 def get_grounding_output(model, image, caption, box_threshold, text_threshold=None, with_logits=True, cpu_only=False, token_spans=None):
     assert text_threshold is not None or token_spans is not None, "text_threshould and token_spans should not be None at the same time!"
